@@ -1,0 +1,18 @@
+# virtual enviornment
+venv/
+.env/
+.env
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# flask cache
+instance/
+*.db
+*.sqlite3
+
+# OS junk
+.DS_Store
+Thumbs.db
