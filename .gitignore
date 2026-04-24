@@ -16,3 +16,8 @@ instance/
 # OS junk
 .DS_Store
 Thumbs.db
+
+# database (ignroed, and then everybody uses migrate to migrate the database onto their own system)
+*.db
+*.sqlite
+*.sqlite3
