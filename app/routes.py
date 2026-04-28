@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
-from app.forms import LoginForm
+from app.forms import LoginForm, TagSearchForm
 from app.models import User, Org, Tag
 
 ggm = Blueprint('main', __name__)
@@ -12,8 +12,8 @@ def list():
     # only display published organizations on the orgslist page
     organizations = Org.query.filter_by(published=True).all()
     tags = Tag.query.all()
-
-    return render_template('list.html', organizations=organizations, tags=tags)
+    form = TagSearchForm()
+    return render_template('list.html', orgs=organizations, tags=tags, form=form)
 
 @ggm.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
@@ -22,7 +22,7 @@ def adminlogin():
     
 @ggm.route('/Adminlogout')
 @login_required
-def adminlogout()
+def adminlogout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.list'))

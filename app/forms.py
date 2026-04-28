@@ -20,7 +20,7 @@ class TagSearchForm(FlaskForm):
         "Exclude tags:",
         choices = tags
     )
-    submit = SubmitField("submit!")
+    submit = SubmitField("Filter Organizations")
 
 # Form for creating/editing blog posts
 class OrganizationForm(FlaskForm):
