@@ -1,7 +1,11 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectMultipleField
+<<<<<<< HEAD
 from wtforms.validators import DataRequired, Optional
 from SelectMultipleCheckboxesField import SelectMultipleCheckboxesField
+=======
+from wtforms.validators import DataRequired, Optional, URL
+>>>>>>> ba2463b61bf991d1eabddc9d3527faf40180a4c7
 
 # Admin login form
 class LoginForm(FlaskForm):
