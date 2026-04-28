@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Optional
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectMultipleField
+from wtforms.validators import DataRequired, Optional, URL
 
 # Admin login form
 class LoginForm(FlaskForm):
@@ -12,5 +12,8 @@ class LoginForm(FlaskForm):
 # Form for creating/editing blog posts
 class OrganizationForm(FlaskForm):
     name = StringField('Organization Name', validators=[DataRequired()])
+    website = StringField('Website', validators=[Optional(), URL()])
     description = TextAreaField('Description', validators=[Optional()])
+    address = StringField('Address', validators=[Optional()])
+    tags = SelectMultipleField('Tags', coerce=int) # choices will be set in the route
     submit = SubmitField('Submit')
