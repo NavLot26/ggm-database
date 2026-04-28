@@ -1,0 +1,116 @@
+<html>
+    <style>
+        .mainpanel{
+            position: fixed;
+            top: 60px;
+            bottom: 0px;
+            right: 0px;
+            width: 67%;
+            background-color: white;
+            margin: 0;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        
+        .sidepanel{
+            position: fixed;
+            top: 48px;
+            bottom: 0px;
+            left: 0px;
+            width: 33%;
+            background-color: rgb(239, 232, 222);
+            margin: 0;
+            box-sizing: border-box;
+            overflow-y: auto;
+            font-family: Arial;
+        }
+        
+        .org {
+            background-color: rgb(239, 232, 222);
+            color: black;
+            border: 0px solid black;
+            padding: 20px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            box-sizing: border-box;
+            border-radius: 30px;
+            margin: 30px;
+            font-family: Arial;
+            box-shadow: 0px 6px 15px rgb(200, 200, 200)
+        }
+
+        .tag {
+            background-color: rgb(232, 115, 36);
+            border-radius: 20px;
+            padding: 10px;
+            padding-top: 5px;
+            line-height: 2;
+            padding-bottom: 5px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .topnav {
+            background-color: rgb(232, 115, 36);
+            overflow: auto;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            
+        }
+        
+        /* Style the links inside the navigation bar */
+        .topnav a {
+            float: left;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            font-family: Arial;
+        }
+        
+        /* Change the color of links on hover */
+        .topnav a:hover {
+            background-color: rgb(0, 0, 0);
+            color: white;
+        }
+        
+        /* Add a color to the active/current link */
+        .topnav a.active {
+            background-color: rgb(239, 232, 222);
+            color: black;
+        }
+    </style>
+
+    <head>
+        <title>GGM Database - List</title>
+    </head>
+
+    <body>
+        <div class="topnav">
+          <a class="active" href="{{ url_for('list') }}">List</a>
+          <a href="{{ url_for('map') }}">Map</a>
+          <a href="{{ url_for('suggest') }}">Suggest</a>
+          <a href="{{ url_for('login') }}">Login</a>
+        </div>
+        <div class="sidepanel">
+            this is a bunch of tags and checkboxes that i don't wanna deal with yet
+        </div>
+        <div class="mainpanel">
+            {% for org in orgs %}
+            <div class="org">
+                <h2> {{ org.name }} </h2>
+                <p>{% for tag in org.tags %} <span class="tag">{{tag}}</span> {% endfor %}</p>
+                <p>{{ org.description }}</p>
+                <p><a href="{{user.website}}">Website</a></p>
+                <p>Address: 
+                <br>{{ user.address1 }}, 
+                {% if user.address2 != "NULL" %} <br> {{ user.address2 }} {% endif %} 
+                <br>{{city}}, {{state}}, {{zipcode}}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>

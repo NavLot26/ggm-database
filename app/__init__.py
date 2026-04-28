@@ -1,21 +1,11 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask import Flask 
 from config import Config
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
-db = SQLAlchemy()
-login_manager = LoginManager()
-login.login_view = 'login' # redict to 'login' page if not authenticated
+app = Flask(__name__) # app instances 
+app.config.from_object(Config) # use the configuration class to set configure the app 
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_object(Config)
-
-    # initialize extensions
-    db.init_app(app)
-    login.init_app(app)
-
-   # import routes and models
-    from app import routes, models
-    
-    return app
+from app import routes, models
