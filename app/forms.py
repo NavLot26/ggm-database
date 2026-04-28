@@ -1,11 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectMultipleField
-<<<<<<< HEAD
-from wtforms.validators import DataRequired, Optional
 from SelectMultipleCheckboxesField import SelectMultipleCheckboxesField
-=======
 from wtforms.validators import DataRequired, Optional, URL
->>>>>>> ba2463b61bf991d1eabddc9d3527faf40180a4c7
 
 # Admin login form
 class LoginForm(FlaskForm):
@@ -30,7 +26,7 @@ class TagSearchForm(FlaskForm):
 class OrganizationForm(FlaskForm):
     name = StringField('Organization Name', validators=[DataRequired()])
     tags=["Direct Service", "Environmental", "Food Insecurity", "Housing Insecurity", "Animals", "Children", "Elderly", "Over 16", "Health/Medical"],
-    include = SelectMultipleField(
+    include = SelectMultipleCheckboxesField(
         "Include tags:",
         choices = tags
     )
