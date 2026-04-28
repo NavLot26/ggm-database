@@ -42,3 +42,6 @@ class Tag(db.Model):
         back_populates="tags"
     )
 
+    def __repr__(self):
+       return f'<Tag {self.name}>'
+

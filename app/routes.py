@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
 from app.forms import LoginForm
-from app.models import User, Org, Tag
+from app.models import Org, Tag
 
 ggm = Blueprint('main', __name__)
 
@@ -22,7 +22,7 @@ def adminlogin():
     
 @ggm.route('/Adminlogout')
 @login_required
-def adminlogout()
+def adminlogout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.list'))
