@@ -8,4 +8,4 @@ app.config.from_object(Config) # use the configuration class to set configure th
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-from app import routes, models
+# from app import routes, models
