@@ -1,24 +1,40 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
-from app.forms import LoginForm
-from app.models import Org, Tag
+
+from app.forms import LoginForm, OrganizationForm, TagSearchForm
+from app.models import User, Org, Tag
 
 ggm = Blueprint('main', __name__)
 
-@ggm.route('/')
-@ggm.route('/list')
+@ggm.route('/', methods=['GET', 'POST'])
+@ggm.route('/list', methods=['GET', 'POST'])
 def list():
     # only display published organizations on the orgslist page
     organizations = Org.query.filter_by(published=True).all()
     tags = Tag.query.all()
-
-    return render_template('list.html', organizations=organizations, tags=tags)
+    form = TagSearchForm()
+    return render_template('list.html', orgs=organizations, tags=tags, form=form)
 
 @ggm.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
     if current_user.is_authenticated:
+        return redirect(url_for('main.admin_list'))
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+
+        if user is None or not user.check_password(current_user.password):
+            flash('Invalid username or password', 'danger')
+            return redirect(url_for('main.adminlogin'))
+    
+        login_user(user, remember = form.remember_me.data)
+        flash('You have been logged in.', 'success')
         return redirect(url_for('main.list'))
+
+    return render_template('admin_login.html', form=form)
     
 @ggm.route('/Adminlogout')
 @login_required
