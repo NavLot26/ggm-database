@@ -17,7 +17,14 @@ def list():
     for tag in tagobjs:
         tags.append(tagobjs.name)
     form = TagSearchForm()
-    return render_template('list.html', orgs=organizations, tags=tags, form=form)
+
+    filterin = []
+    filterout = []
+
+    if form.validate_on_submit():
+        filterin = form.include.data
+        filterout = form.include.data
+    return render_template('list.html', orgs=organizations, tags=tags, form=form, filterin = filterin, filterout = filterout)
 
 @ggm.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
