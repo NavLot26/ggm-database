@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
+
 from app.forms import LoginForm, OrganizationForm, TagSearchForm
-from app.models import Org, Tag
+from app.models import User, Org, Tag
 
 ggm = Blueprint('main', __name__)
 
@@ -13,8 +14,7 @@ def list():
     organizations = Org.query.filter_by(published=True).all()
     tags = Tag.query.all()
     form = TagSearchForm()
-
-    return render_template('list.html', organizations=organizations, tags=tags, form=form)
+    return render_template('list.html', orgs=organizations, tags=tags, form=form)
 
 @ggm.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
