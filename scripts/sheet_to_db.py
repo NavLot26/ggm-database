@@ -8,6 +8,7 @@ app.app_context().push()
 with open('sheet.csv', newline='') as sheet: 
     reader = csv.DictReader(sheet)
     
+    # create an org based on the information from each row 
     for row in reader: 
         org = Org(
             name=row["name"], 
@@ -20,5 +21,7 @@ with open('sheet.csv', newline='') as sheet:
             published=True
         )
 
+
+        # add then after everything commit the session to keep the changes
         db.session.add(org)
     db.session.commit()

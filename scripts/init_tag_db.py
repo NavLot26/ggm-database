@@ -16,6 +16,7 @@ start_tags = [
     "Health/Medical",
 ]
 
+# just init and add each tag to the db
 for tag_name in start_tags: 
     tag = Tag(name = tag_name)
     db.session.add(tag)
