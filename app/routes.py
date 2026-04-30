@@ -11,7 +11,10 @@ ggm = Blueprint('main', __name__)
 def list():
     # only display published organizations on the orgslist page
     organizations = Org.query.filter_by(published=True).all()
-    tags = Tag.query.all()
+    tagobjs = Tag.query.all()
+    tags = []
+    for tag in tagobjs:
+        tags.append(tagobjs.name)
     form = TagSearchForm()
     return render_template('list.html', orgs=organizations, tags=tags, form=form)
 

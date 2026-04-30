@@ -2,6 +2,14 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectMultipleField
 from SelectMultipleCheckboxesField import SelectMultipleCheckboxesField
 from wtforms.validators import DataRequired, Optional, URL
+from wtforms.widgets import CheckboxInput, ListWidget
+from app import app, db
+from app.models import User, Org, Tag
+
+
+class SelectMultipleCheckboxesField(SelectMultipleField):
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
 
 # Admin login form
 class LoginForm(FlaskForm):
@@ -11,7 +19,10 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 class TagSearchForm(FlaskForm):
-    tags=["Direct Service", "Environmental", "Food Insecurity", "Housing Insecurity", "Animals", "Children", "Elderly", "Over 16", "Health/Medical"],
+    tagobjs = Tag.query.all()
+    tags = []
+    for tag in tagobjs:
+        tags.append(tagobjs.name)
     include = SelectMultipleCheckboxesField(
         "Include tags:",
         choices = tags

@@ -118,7 +118,7 @@
             {% for org in orgs %}
             <div class="org">
                 <h2> {{ org.name }} </h2>
-                <p>{% for tag in org.tags %} <span class="tag">{{tag}}</span> {% endfor %}</p>
+                <p>{% for tag in org.tags %} <span class="tag">{{tag.name}}</span> {% endfor %}</p>
                 <p>{{ org.description }}</p>
                 <p><a href="{{user.website}}">Website</a></p>
                 <p>Address: 
