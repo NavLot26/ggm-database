@@ -102,7 +102,7 @@
             <!-- show Admin link if logged in, otherwise show Login -->
             <!-- current_user.is_authenticated is from Flask-Login (Miguel Chapter 5) -->
             {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.admin_list') }}">Admin</a>
+            <a href="{{ url_for('main.admin_list') }}">Admin List</a>
             {% else %}
             <a href="{{ url_for('main.adminlogin') }}">Login</a>
             {% endif %}
