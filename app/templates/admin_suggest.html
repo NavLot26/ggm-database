@@ -1,0 +1,175 @@
+/* https://www.w3schools.com/css/default.asp */
+
+<html>
+    <style>
+        .topnav { /* https://www.w3schools.com/howto/howto_js_topnav.asp */
+            background-color: rgb(232, 115, 36);
+            overflow: auto;
+            position: fixed; /* keeps nav stuck to top while scrolling */
+            top: 0px;
+            left: 0px;
+            right: 0px;
+        }
+
+        .topnav a {
+            float: left; /* lines up nav links horizontally */
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none; /* removes underline from links */
+            font-size: 17px;
+            font-family: Arial;
+        }
+
+        .topnav a:hover {
+            background-color: rgb(0, 0, 0); /* darkens link when user hovers */
+            color: white;
+        }
+
+        .topnav a.active {
+            background-color: rgb(239, 232, 222); /* highlights current page */
+            color: black;
+        }
+
+        .suggest-box {
+            /* centered card, same style as suggest.html */
+            /* https://www.w3schools.com/css/css_boxmodel.asp */
+            background-color: rgb(239, 232, 222);
+            color: black;
+            border: 0px solid black;
+            padding: 40px;
+            padding-top: 20px;
+            box-sizing: border-box; /* padding + width calculation */
+            border-radius: 30px; /* rounded corners --> https://www.w3schools.com/css/css3_borders.asp */
+            margin: 100px auto 30px auto; /* 100px top clears nav + auto left/right centers box --> https://www.w3schools.com/css/css_margin.asp */
+            font-family: Arial;
+            box-shadow: 0px 6px 15px rgb(200, 200, 200); /* shadow --> https://www.w3schools.com/css/css3_shadows_box.asp */
+            width: 600px;
+        }
+
+        .suggest-box h2 {
+            color: rgb(232, 115, 36); /* orange heading to match theme */
+            margin-bottom: 20px;
+            text-align: center; /* https://www.w3schools.com/css/css_text.asp */
+        }
+
+        /* TODO: add .form-group, input[type="text"], and textarea styling later */
+        /* https://www.w3schools.com/css/css_attribute_selectors.asp */
+        /* https://www.w3schools.com/css/css_form.asp */
+
+        .submit-btn {
+            background-color: rgb(232, 115, 36);
+            border-radius: 20px; /* i cant think of the word for this shaped button */
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            color: white;
+            font-weight: bold;
+            font-family: Arial;
+            border: none; /* removes default browser button border */
+            cursor: pointer; /* shows hand cursor on hover --> https://www.w3schools.com/cssref/pr_class_cursor.asp */
+            font-size: 15px;
+            width: 100%; /* stretches button across full width of box */
+            line-height: 2;
+        }
+
+        .submit-btn:hover {
+            background-color: black;
+        }
+
+        .publish-btn {
+            background-color: rgb(232, 115, 36);
+            border-radius: 20px; /* i cant think of the word for this shaped button */
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            color: white;
+            font-weight: bold;
+            font-family: Arial;
+            border: none; /* removes default browser button border */
+            cursor: pointer; /* shows hand cursor on hover --> https://www.w3schools.com/cssref/pr_class_cursor.asp */
+            font-size: 15px;
+            width: 100%; /* stretches button across full width of box */
+            line-height: 2;
+            margin-top: 10px; /* space between submit and publish buttons */
+        }
+
+        .publish-btn:hover {
+            background-color: black;
+        }
+
+        .flash {
+            /* error/confirmation message box */
+            background-color: rgb(255, 220, 200);
+            color: rgb(180, 60, 0);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: Arial;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <head>
+        <title>GGM Database - Edit Organization</title>
+    </head>
+
+/* https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms */
+    <body>
+        <div class="topnav">
+            <a href="{{ url_for('main.list') }}">List</a>
+            <a href="{{ url_for('main.map') }}">Map</a>
+            <a href="{{ url_for('main.suggest') }}">Suggest</a>
+            <!-- admin is always logged in on this page -->
+            <a class="active" href="{{ url_for('main.admin_list') }}">Admin</a>
+            <a href="{{ url_for('main.adminlogout') }}">Logout</a>
+        </div>
+
+        <div class="suggest-box">
+            <h2>Edit Organization</h2>
+
+            <!-- display any flash messages ex. "changes saved" -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <!-- form already has org data from OrganizationForm(obj=org) in the route -->
+            <!-- TODO: add .form-group styling in CSS later -->
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.name.label }}<br>{{ form.name() }}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label }}<br>{{ form.description(rows=4) }}
+                </div>
+                <div class="form-group">
+                    {{ form.website.label }}<br>{{ form.website() }}
+                </div>
+                <div class="form-group">
+                    {{ form.address1.label }}<br>{{ form.address1() }}
+                </div>
+                <div class="form-group">
+                    {{ form.address2.label }}<br>{{ form.address2() }}
+                </div>
+                <div class="form-group">
+                    {{ form.city.label }}<br>{{ form.city() }}
+                </div>
+                <div class="form-group">
+                    {{ form.state.label }}<br>{{ form.state() }}
+                </div>
+                <div class="form-group">
+                    {{ form.zipcode.label }}<br>{{ form.zipcode() }}
+                </div>
+                <!-- save changes without publishing -->
+                {{ form.submit(class="submit-btn") }}
+                <!-- save changes and set published=True -->
+                <button type="submit" name="publish" value="true" class="publish-btn">Publish</button>
+            </form>
+        </div>
+    </body>
+</html>

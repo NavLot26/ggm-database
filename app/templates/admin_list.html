@@ -1,0 +1,189 @@
+<html>
+    <style>
+        .mainpanel{
+            position: fixed;
+            top: 60px;
+            bottom: 0px;
+            right: 0px;
+            width: 67%;
+            background-color: white;
+            margin: 0;
+            box-sizing: border-box; /* padding + width calculation */
+            overflow-y: auto; /* adds scrollbar when theres a lot of content --> https://www.w3schools.com/css/css_overflow.asp */
+        }
+        
+        .sidepanel{
+            position: fixed;
+            top: 48px;
+            bottom: 0px;
+            left: 0px;
+            width: 33%;
+            background-color: rgb(239, 232, 222);
+            margin: 0;
+            box-sizing: border-box;
+            overflow-y: auto;
+            font-family: Arial;
+        }
+        
+        .org {
+            background-color: rgb(239, 232, 222);
+            color: black;
+            border: 0px solid black;
+            padding: 20px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            box-sizing: border-box;
+            border-radius: 30px; /* rounded corners --> https://www.w3schools.com/css/css3_borders.asp */
+            margin: 30px;
+            font-family: Arial;
+            box-shadow: 0px 6px 15px rgb(200, 200, 200); /* shadow --> https://www.w3schools.com/css/css3_shadows_box.asp */
+        }
+
+        .org.unpublished {
+            /* red tint on unpublished orgs so Ms. Pineau can spot them easily */
+            background-color: rgb(255,200,200);
+            box-shadow: 0px 6px 15px rgb(200, 180, 170)
+        }
+
+        .tag {
+            background-color: rgb(232, 115, 36);
+            border-radius: 20px;
+            padding: 10px;
+            padding-top: 5px;
+            line-height: 2;
+            padding-bottom: 5px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .status {
+            /* badge showing published/unpublished status */
+            border-radius: 20px;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .status.published {
+            background-color: rgb(60,160,60); /* green for published */
+        }
+
+        .status.unpublished {
+            background-color: rgb(180,60,0); /* dark red for unpublished */
+        }
+
+        .edit-btn {
+            background-color: rgb(232,115,36);
+            color: white;
+            padding: 8px 16px;
+            font-weight: bold;
+            font-family: Arial;
+            font-size: 14px;
+            text-decoration: none; /* removes underline from link */
+            display: inline-block; /* allows padding on tag --> https://www.w3schools.com/css/css_display_visibility.asp */
+            margin-top: 8px;
+            margin-bottom: 8px;
+            border-radius: 20px;
+        }
+
+        .edit-btn:hover {
+            background-color: black;
+        }
+        
+        .topnav { /* https://www.w3schools.com/howto/howto_js_topnav.asp */
+            background-color: rgb(232, 115, 36);
+            overflow: auto;
+            position: fixed; /* keeps nav stuck to top while scrolling */
+            top: 0px;
+            left: 0px;
+            right: 0px;
+        }
+        
+        /* style the links inside the navigation bar */
+        .topnav a {
+            float: left; /* lines up nav links horizontally */
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none; /* removes underline from links */
+            font-size: 17px;
+            font-family: Arial;
+        }
+        
+        /* change the color of links on hover */
+        .topnav a:hover {
+            background-color: rgb(0, 0, 0); /* darkens link when user hovers */
+            color: white;
+        }
+        
+        /* add a color to the active/current link */
+        .topnav a.active {
+            background-color: rgb(239, 232, 222); /* highlights current page */
+            color: black;
+        }
+
+        .flash {
+            /* error/confirmation message box */
+            background-color: rgb(255, 220, 200);
+            color: rgb(180, 60, 0);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: Arial;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 800px) {
+            /* stacks sidepanel on top of mainpanel on small screens --> https://www.w3schools.com/css/css_rwd_mediaqueries.asp */
+            .sidepanel {width: 100%; height: 30%}
+            .mainpanel {width: 100%; top: calc(48px + 30%); zoom: 0.8;};
+        }
+    </style>
+
+    <head>
+        <title>GGM Database - Admin List</title>
+    </head>
+
+    <body>
+        <div class="topnav">
+          <a class="active" href="{{ url_for('main.admin_list') }}">Admin</a>
+          <a href="{{ url_for('main.list') }}">List</a>
+          <a href="{{ url_for('main.map') }}">Map</a>
+          <a href="{{ url_for('main.suggest') }}">Suggest</a>
+          <a href="{{ url_for('main.adminlogout') }}">Logout</a>
+        </div>
+        <div class="sidepanel">
+            <!-- display any flash messages ex. "changes saved" -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+        <div class="mainpanel">
+            {% for org in organizations %}
+            <!-- adds unpublished class to card if org is not published -->
+            <div class="org {% if not org.published %}unpublished{% endif %}">
+                <h2>{{ org.name }} 
+                    <!-- green Published or red Unpublished badge -->
+                    {% if org.published %}
+                    <span class="status published">Published</span>
+                    {% else %}
+                    <span class="status unpublished">Unpublished</span>
+                    {% endif %}
+                </h2>
+                <p>{% for tag in org.tags %}<span class="tag">{{ tag.name }}</span> {% endfor %}</p>
+                <p>{{ org.description }}</p>
+                <p><a href="{{ org.website }}">Website</a></p>
+                <!-- edit button passes org id to admin_suggest so it knows which org to load -->
+                <a href="{{ url_for('main.admin_suggest', org_id=org.id) }}" class="edit-btn">Edit</a>
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>
