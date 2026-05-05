@@ -1,10 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectMultipleField
-from SelectMultipleCheckboxesField import SelectMultipleCheckboxesField
 from wtforms.validators import DataRequired, Optional, URL
 from wtforms.widgets import CheckboxInput, ListWidget
 from app import app, db
-from app.models import User, Org, Tag
+from app.models import Org, Tag
 
 
 class SelectMultipleCheckboxesField(SelectMultipleField):
@@ -27,13 +26,14 @@ class TagSearchForm(FlaskForm):
         "Include tags:",
         choices = tags
     )
-    include = SelectMultipleCheckboxesField(
+    exclude = SelectMultipleCheckboxesField(
         "Exclude tags:",
         choices = tags
     )
     submit = SubmitField("Filter Organizations")
 
 # Form for creating/editing blog posts
+# TAGS ARE CURRENTLY HARDCODED. this must be fixed before completion
 class OrganizationForm(FlaskForm):
     name = StringField('Organization Name', validators=[DataRequired()])
     tags=["Direct Service", "Environmental", "Food Insecurity", "Housing Insecurity", "Animals", "Children", "Elderly", "Over 16", "Health/Medical"],

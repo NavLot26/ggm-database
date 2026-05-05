@@ -21,6 +21,26 @@ def list():
     filterin = []
     filterout = []
 
+    for i in range(len(organizations)-1, -1, -1):   #really messy and non-optimized but i think functional code for list filtering
+        valid = True
+        for fin in filterin:
+            found = False
+            for tag in organizations[i].tags:
+                if (tag.name == fin):
+                    found = True
+            if not found:
+                valid = False
+        for fout in filterout:
+            found = False
+            for tag in organizations[i].tags:
+                if (tag.name == fout):
+                    found = True
+            if found:
+                valid = False
+        if not valid:
+            organizations.pop(i)
+    
+
     if form.validate_on_submit():
         filterin = form.include.data
         filterout = form.include.data
