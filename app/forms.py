@@ -27,7 +27,7 @@ class TagSearchForm(FlaskForm):
         "Include tags:",
         choices = tags
     )
-    include = SelectMultipleCheckboxesField(
+    exclude = SelectMultipleCheckboxesField(
         "Exclude tags:",
         choices = tags
     )
