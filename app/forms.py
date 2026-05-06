@@ -18,19 +18,17 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 class TagSearchForm(FlaskForm):
-    tagobjs = Tag.query.all()
-    tags = []
-    for tag in tagobjs:
-        tags.append(tagobjs.name)
-    include = SelectMultipleCheckboxesField(
-        "Include tags:",
-        choices = tags
-    )
-    exclude = SelectMultipleCheckboxesField(
-        "Exclude tags:",
-        choices = tags
-    )
-    submit = SubmitField("Filter Organizations")
+    include = SelectMultipleCheckboxesField("Include tags:", choices=[])
+    exclude = SelectMultipleCheckboxesField("Exclude tags:", choices=[])
+    submit = SubmitField("Filter")
+
+    def __init__(self, *args, **kwargs): 
+        super().__init__(*args, **kwargs)
+        tags = [(t.name, t.name) for t in Tag.query.all()]
+        self.include.choices = tags
+        self.exclude.choices = tags
+
+
 
 # Form for creating/editing blog posts
 # TAGS ARE CURRENTLY HARDCODED. this must be fixed before completion

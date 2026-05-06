@@ -3,23 +3,35 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
 
 from app.forms import LoginForm, OrganizationForm, TagSearchForm
-from app.models import User, Org, Tag
+from app.models import Org, Tag
 
-ggm = Blueprint('main', __name__)
+from flask import session
 
-@ggm.route('/', methods=['GET', 'POST'])
-@ggm.route('/list', methods=['GET', 'POST'])
+# ggm = Blueprint('main', __name__)
+
+# this is initizalized to be None on program startup allowing it to be cached globably but only intialized when the database actually exists 
+include_cache = None
+exclude_cache = None
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/list', methods=['GET', 'POST'])
 def list():
+ 
+    form = TagSearchForm(); 
+
+    if form.validate_on_submit():
+        # save the include and exclude data in the session dict, not the objects themsevles which are tied to the context
+        session["include"] = form.include.data
+        session["exclude"] = form.exclude.data 
+    
+    # init filter in and filter out now based on the session include and exclude objects, or blank if the session has not stored them yet
+    filterin = session.get('include') or []
+    filterout = session.get('exclude') or []
+
+
     # only display published organizations on the orgslist page
     organizations = Org.query.filter_by(published=True).all()
-    tagobjs = Tag.query.all()
-    tags = []
-    for tag in tagobjs:
-        tags.append(tagobjs.name)
-    form = TagSearchForm()
-
-    filterin = []
-    filterout = []
+    
 
     for i in range(len(organizations)-1, -1, -1):   #really messy and non-optimized but i think functional code for list filtering
         valid = True
@@ -39,14 +51,10 @@ def list():
                 valid = False
         if not valid:
             organizations.pop(i)
-    
 
-    if form.validate_on_submit():
-        filterin = form.include.data
-        filterout = form.include.data
-    return render_template('list.html', orgs=organizations, tags=tags, form=form, filterin = filterin, filterout = filterout)
-
-@ggm.route('/Adminlogin', methods=['GET', 'POST'])
+    return render_template('list.html', orgs=organizations, tags=form.tagsnames, form=form, filterin = filterin, filterout = filterout)
+ 
+@app.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
     if current_user.is_authenticated:
         return redirect(url_for('main.admin_list'))
@@ -66,21 +74,21 @@ def adminlogin():
 
     return render_template('admin_login.html', form=form)
     
-@ggm.route('/Adminlogout')
+@app.route('/Adminlogout')
 @login_required
 def adminlogout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.list'))
 
-@ggm.route('/admin_list')
+@app.route('/admin_list')
 @login_required
 def admin_list():
     organizations = Org.query.all()
     tags = Tag.query.all()
     return render_template('admin_list.html', organizations=organizations, tags=tags)
 
-@ggm.route('/admin_suggest', methods=['GET', 'POST'])
+@app.route('/admin_suggest', methods=['GET', 'POST'])
 @login_required
 def admin_suggest():
     if request.method == 'POST':
