@@ -52,7 +52,7 @@ def list():
         if not valid:
             organizations.pop(i)
 
-    return render_template('list.html', orgs=organizations, tags=form.tagsnames, form=form, filterin = filterin, filterout = filterout)
+    return render_template('list.html', orgs=organizations, tags=form.tags, form=form, filterin = filterin, filterout = filterout)
  
 @app.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():

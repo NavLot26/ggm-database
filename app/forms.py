@@ -21,12 +21,13 @@ class TagSearchForm(FlaskForm):
     include = SelectMultipleCheckboxesField("Include tags:", choices=[])
     exclude = SelectMultipleCheckboxesField("Exclude tags:", choices=[])
     submit = SubmitField("Filter")
+    
 
     def __init__(self, *args, **kwargs): 
         super().__init__(*args, **kwargs)
-        tags = [(t.name, t.name) for t in Tag.query.all()]
-        self.include.choices = tags
-        self.exclude.choices = tags
+        TagSearchForm.tags = [(t.name, t.name) for t in Tag.query.all()]
+        self.include.choices = TagSearchForm.tags
+        self.exclude.choices = TagSearchForm.tags
 
 
 
