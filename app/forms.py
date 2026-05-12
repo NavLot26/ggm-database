@@ -18,18 +18,22 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 class TagSearchForm(FlaskForm):
+    # choices are initially set to be empty here, because they can only be initialized 
     include = SelectMultipleCheckboxesField("Include tags:", choices=[])
-    exclude = SelectMultipleCheckboxesField("Exclude tags:", choices=[])
     submit = SubmitField("Filter")
-    
 
-    def __init__(self, *args, **kwargs): 
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        TagSearchForm.tags = [(t.name, t.name) for t in Tag.query.all()]
-        self.include.choices = TagSearchForm.tags
-        self.exclude.choices = TagSearchForm.tags
 
+        from app.models import Tag 
 
+        tags = Tag.query.all()
+        choices = [(str(tag.id), tag.name) for tag in tags] # choices for SelectMultipleCheckboxesField expects id, name tuple 
+
+        self.include.choices = choices
+        self.include.data = [str(tag.id) for tag in tags]
+
+        self.process()
 
 # Form for creating/editing blog posts
 # TAGS ARE CURRENTLY HARDCODED. this must be fixed before completion

@@ -95,10 +95,7 @@
 
     <body>
         <div class="topnav">
-          <a class="active" href="{{ url_for('list') }}">List</a>
-          <a href="{{ url_for('map') }}">Map</a>
-          <a href="{{ url_for('suggest') }}">Suggest</a>
-          <a href="{{ url_for('login') }}">Login</a>
+         
         </div>
         <div class="sidepanel">
             <form action="" method="post" novalidate>
@@ -107,26 +104,22 @@
                     {{ form.include.label }}<br>
                     {{ form.include(size=32) }}<br>
                 </p>
-                <p>
-                    {{ form.exclude.label }}<br>
-                    {{ form.exclude(size=32) }}<br>
-                </p>
                 <p>{{ form.submit() }}</p>
             </form>
         </div>
         <div class="mainpanel">
-            <!-- {% for org in orgs %}
+            {% for org in orgs %}
             <div class="org">
                 <h2> {{ org.name }} </h2>
                 <p>{% for tag in org.tags %} <span class="tag">{{tag.name}}</span> {% endfor %}</p>
                 <p>{{ org.description }}</p>
-                <p><a href="{{user.website}}">Website</a></p>
+                <p><a href="{{org.website}}">Website</a></p>
                 <p>Address: 
-                <br>{{ user.address1 }}, 
-                {% if user.address2 != "NULL" %} <br> {{ user.address2 }} {% endif %} 
+                <br>{{ org.address1 }}, 
+                {% if org.address2 != "NULL" %} <br> {{ org.address2 }} {% endif %} 
                 <br>{{city}}, {{state}}, {{zipcode}}</p>
             </div>
-            {% endfor %} -->
+            {% endfor %}
         </div>
     </body>
 </html>

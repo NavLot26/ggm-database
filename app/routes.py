@@ -7,6 +7,8 @@ from app.models import Org, Tag
 
 from flask import session
 
+from sqlalchemy import func
+
 # ggm = Blueprint('main', __name__)
 
 # this is initizalized to be None on program startup allowing it to be cached globably but only intialized when the database actually exists 
@@ -15,45 +17,39 @@ exclude_cache = None
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/list', methods=['GET', 'POST'])
-def list():
- 
-    form = TagSearchForm(); 
+def list(): 
+    form = TagSearchForm()
+    # query the included ids from the saved state, if nothing is there, and empty list is used
+    include_ids = [int(id) for id in session.get("include", [])]
 
+    # we intialize the form data with the session data on get
+    if request.method == "GET":
+        form.include.data = include_ids
+
+    # we update the session data to the form data on post 
     if form.validate_on_submit():
-        # save the include and exclude data in the session dict, not the objects themsevles which are tied to the context
         session["include"] = form.include.data
-        session["exclude"] = form.exclude.data 
+        return redirect(url_for("list"))  # Fix bug with refresh interference and stuff 
+
+
     
-    # init filter in and filter out now based on the session include and exclude objects, or blank if the session has not stored them yet
-    filterin = session.get('include') or []
-    filterout = session.get('exclude') or []
+    filtered = (
+        db.session.query(Org)
+        .filter(Org.published == True)
+    )
+
+    if include_ids:
+        filtered = filtered.filter(
+            Org.tags.any(Tag.id.in_(include_ids))
+        )
+
+    filtered = filtered.all()
+
+    print(filtered)
+
+    return render_template('list.html', orgs=filtered, form=form)
 
 
-    # only display published organizations on the orgslist page
-    organizations = Org.query.filter_by(published=True).all()
-    
-
-    for i in range(len(organizations)-1, -1, -1):   #really messy and non-optimized but i think functional code for list filtering
-        valid = True
-        for fin in filterin:
-            found = False
-            for tag in organizations[i].tags:
-                if (tag.name == fin):
-                    found = True
-            if not found:
-                valid = False
-        for fout in filterout:
-            found = False
-            for tag in organizations[i].tags:
-                if (tag.name == fout):
-                    found = True
-            if found:
-                valid = False
-        if not valid:
-            organizations.pop(i)
-
-    return render_template('list.html', orgs=organizations, tags=form.tags, form=form, filterin = filterin, filterout = filterout)
- 
 @app.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
     if current_user.is_authenticated:
@@ -95,3 +91,10 @@ def admin_suggest():
         # Handle form submission
         pass
     return render_template('admin_suggest.html')
+
+
+# <!-- <a href="{{ url_for('map') }}">Map</a> -->
+#  <!-- <a class="active" href="{{ url_for('list') }}">List</a>
+          
+#           <a href="{{ url_for('suggest') }}">Suggest</a>
+#           <a href="{{ url_for('login') }}">Login</a> -->
