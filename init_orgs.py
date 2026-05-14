@@ -5,7 +5,7 @@ from app.models import Org
 app.app_context().push()
 
 
-with open('scripts/sheet.csv', newline='') as sheet: 
+with open('sheet.csv', newline='') as sheet: 
     reader = csv.DictReader(sheet)
     
     # create an org based on the information from each row 

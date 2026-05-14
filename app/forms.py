@@ -31,9 +31,9 @@ class TagSearchForm(FlaskForm):
         choices = [(str(tag.id), tag.name) for tag in tags] # choices for SelectMultipleCheckboxesField expects id, name tuple 
 
         self.include.choices = choices
-        self.include.data = [str(tag.id) for tag in tags]
+        # self.include.data = [str(tag.id) for tag in tags]
 
-        self.process()
+        # self.process()
 
 # Form for creating/editing blog posts
 # TAGS ARE CURRENTLY HARDCODED. this must be fixed before completion

@@ -29,6 +29,7 @@ def list():
     # we update the session data to the form data on post 
     if form.validate_on_submit():
         session["include"] = form.include.data
+        
         return redirect(url_for("list"))  # Fix bug with refresh interference and stuff 
 
 
@@ -37,8 +38,9 @@ def list():
         db.session.query(Org)
         .filter(Org.published == True)
     )
-
+    
     if include_ids:
+        print(include_ids)
         filtered = filtered.filter(
             Org.tags.any(Tag.id.in_(include_ids))
         )
