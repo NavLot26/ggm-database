@@ -3,20 +3,54 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
 
 from app.forms import LoginForm, OrganizationForm, TagSearchForm
-from app.models import User, Org, Tag
+from app.models import Org, Tag
 
-ggm = Blueprint('main', __name__)
+from flask import session
 
-@ggm.route('/', methods=['GET', 'POST'])
-@ggm.route('/list', methods=['GET', 'POST'])
-def list():
-    # only display published organizations on the orgslist page
-    organizations = Org.query.filter_by(published=True).all()
-    tags = Tag.query.all()
+from sqlalchemy import func
+
+# ggm = Blueprint('main', __name__)
+
+# this is initizalized to be None on program startup allowing it to be cached globably but only intialized when the database actually exists 
+include_cache = None
+exclude_cache = None
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/list', methods=['GET', 'POST'])
+def list(): 
     form = TagSearchForm()
-    return render_template('list.html', orgs=organizations, tags=tags, form=form)
+    # query the included ids from the saved state, if nothing is there, and empty list is used
+    include_ids = [int(id) for id in session.get("include", [])]
 
-@ggm.route('/Adminlogin', methods=['GET', 'POST'])
+    # we intialize the form data with the session data on get
+    if request.method == "GET":
+        form.include.data = include_ids
+
+    # we update the session data to the form data on post 
+    if form.validate_on_submit():
+        session["include"] = form.include.data
+        return redirect(url_for("list"))  # Fix bug with refresh interference and stuff 
+
+
+    
+    filtered = (
+        db.session.query(Org)
+        .filter(Org.published == True)
+    )
+
+    if include_ids:
+        filtered = filtered.filter(
+            Org.tags.any(Tag.id.in_(include_ids))
+        )
+
+    filtered = filtered.all()
+
+    print(filtered)
+
+    return render_template('list.html', orgs=filtered, form=form)
+
+
+@app.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
     if current_user.is_authenticated:
         return redirect(url_for('main.admin_list'))
@@ -37,13 +71,14 @@ def adminlogin():
 
     return render_template('admin_login.html', form=form)
     
-@ggm.route('/Adminlogout')
+@app.route('/Adminlogout')
 @login_required
 def adminlogout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.list'))
 
+@app.route('/admin_list')
 # this is the admin page that lists all the organizations and tags, it is only accessible to logged in users
 @login_required
 def admin_list():
