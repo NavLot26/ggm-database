@@ -25,15 +25,14 @@ class TagSearchForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        from app.models import Tag 
+        # from app.models import Tag 
 
         tags = Tag.query.all()
-        choices = [(str(tag.id), tag.name) for tag in tags] # choices for SelectMultipleCheckboxesField expects id, name tuple 
 
-        self.include.choices = choices
-        self.include.data = [str(tag.id) for tag in tags]
+        self.include.choices = [(int(tag.id), tag.name) for tag in tags] # choices for SelectMultipleCheckboxesField expects id, name tuple 
 
-        self.process()
+        self.include.data = [int(tag.id) for tag in tags] # include all of the gags by default 
+
 
 # Form for creating/editing blog posts
 # TAGS ARE CURRENTLY HARDCODED. this must be fixed before completion

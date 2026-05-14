@@ -9,43 +9,36 @@ from flask import session
 
 from sqlalchemy import func
 
-# ggm = Blueprint('main', __name__)
+ggm = Blueprint('main', __name__)
 
-# this is initizalized to be None on program startup allowing it to be cached globably but only intialized when the database actually exists 
-include_cache = None
-exclude_cache = None
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/list', methods=['GET', 'POST'])
 def list(): 
-    form = TagSearchForm()
-    # query the included ids from the saved state, if nothing is there, and empty list is used
-    include_ids = [int(id) for id in session.get("include", [])]
 
-    # we intialize the form data with the session data on get
-    if request.method == "GET":
+   
+    form = TagSearchForm()
+
+    print(request.method)
+    print(form.errors)
+
+    if form.validate_on_submit():
+        print("pushing to session")
+        include_ids = form.include.data
+        session["include"] = include_ids
+
+    else: 
+        print("Pulling from session")
+        include_ids = session.get("include", [])
         form.include.data = include_ids
 
-    # we update the session data to the form data on post 
-    if form.validate_on_submit():
-        session["include"] = form.include.data
-        return redirect(url_for("list"))  # Fix bug with refresh interference and stuff 
 
-
-    
     filtered = (
         db.session.query(Org)
         .filter(Org.published == True)
+        .filter(Org.tags.any(Tag.id.in_(include_ids)))
     )
-
-    if include_ids:
-        filtered = filtered.filter(
-            Org.tags.any(Tag.id.in_(include_ids))
-        )
-
-    filtered = filtered.all()
-
-    print(filtered)
 
     return render_template('list.html', orgs=filtered, form=form)
 
@@ -91,10 +84,3 @@ def admin_suggest():
         # Handle form submission
         pass
     return render_template('admin_suggest.html')
-
-
-# <!-- <a href="{{ url_for('map') }}">Map</a> -->
-#  <!-- <a class="active" href="{{ url_for('list') }}">List</a>
-          
-#           <a href="{{ url_for('suggest') }}">Suggest</a>
-#           <a href="{{ url_for('login') }}">Login</a> -->
