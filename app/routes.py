@@ -60,6 +60,7 @@ def adminlogin():
     form = LoginForm()
 
     if form.validate_on_submit():
+        # check if the user exists and the password is correct
         user = User.query.filter_by(username=form.username.data).first()
 
         if user is None or not user.check_password(current_user.password):
@@ -80,23 +81,68 @@ def adminlogout():
     return redirect(url_for('main.list'))
 
 @app.route('/admin_list')
+# this is the admin page that lists all the organizations and tags, it is only accessible to logged in users
 @login_required
 def admin_list():
     organizations = Org.query.all()
     tags = Tag.query.all()
     return render_template('admin_list.html', organizations=organizations, tags=tags)
 
-@app.route('/admin_suggest', methods=['GET', 'POST'])
+@ggm.route('/suggest', methods=['GET', 'POST'])
+def suggest():
+    form = OrganizationForm()
+
+    if form.validate_on_submit():
+        org = Org(
+            name=form.name.data,
+            website=form.website.data,
+            description=form.description.data,
+            address1=form.address1.data,
+            address2=form.address2.data,
+            city=form.city.data,
+            state=form.state.data,
+            published=False
+        )
+        db.session.add(org)
+        db.session.commit()
+        flash('Organization suggestion submitted successfully.', 'success')
+        return redirect(url_for('main.list'))
+
+    return render_template('suggest.html', form=form)
+
+@ggm.route('/admin_suggest', methods=['GET', 'POST'])
 @login_required
 def admin_suggest():
-    if request.method == 'POST':
-        # Handle form submission
-        pass
-    return render_template('admin_suggest.html')
+    form = OrganizationForm()
 
+    if form.validate_on_submit():
+        org = Org(
+            name=form.name.data,
+            website=form.website.data,
+            description=form.description.data,
+            address1=form.address1.data,
+            address2=form.address2.data,
+            city=form.city.data,
+            state=form.state.data,
+            published=True
+        )
+        db.session.add(org)
+        db.session.commit()
+        flash('Organization added successfully.', 'success')
+        return redirect(url_for('main.admin_list'))
 
-# <!-- <a href="{{ url_for('map') }}">Map</a> -->
-#  <!-- <a class="active" href="{{ url_for('list') }}">List</a>
-          
-#           <a href="{{ url_for('suggest') }}">Suggest</a>
-#           <a href="{{ url_for('login') }}">Login</a> -->
+    return render_template('admin_suggest.html', form=form)
+
+@ggm.route('/admin_edit/<int:org_id>', methods=['GET', 'POST'])
+@login_required
+def admin_edit(org_id):
+    org = Org.query.get_or_404(org_id)
+    form = OrganizationForm(obj=org)
+
+    if form.validate_on_submit():
+        form.populate_obj(org)
+        db.session.commit()
+        flash('Organization updated successfully.', 'success')
+        return redirect(url_for('main.admin_list'))
+
+    return render_template('admin_suggest.html', form=form, org=org)
