@@ -1,0 +1,126 @@
+<html>
+    <style>
+        .mainpanel{
+            position: fixed;
+            top: 60px;
+            bottom: 0px;
+            right: 0px;
+            width: 67%;
+            background-color: white;
+            margin: 0;
+            box-sizing: border-box; /* padding + width calculation */
+            overflow-y: auto; /* adds scrollbar when theres a lot of content --> https://www.w3schools.com/css/css_overflow.asp */
+        }
+
+        .sidepanel{
+            position: fixed;
+            top: 48px;
+            bottom: 0px;
+            left: 0px;
+            width: 33%;
+            background-color: rgb(239, 232, 222);
+            margin: 0;
+            box-sizing: border-box;
+            overflow-y: auto;
+            font-family: Arial;
+        }
+
+        .topnav {
+            background-color: rgb(232, 115, 36);
+            overflow: auto;
+            position: fixed; /* keeps nav stuck to top while scrolling */
+            top: 0px;
+            left: 0px;
+            right: 0px;
+        }
+
+        /* style the links inside the navigation bar */
+        .topnav a {
+            float: left; /* lines up nav links horizontally */
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none; /* removes underline from links */
+            font-size: 17px;
+            font-family: Arial;
+        }
+
+        /* change the color of links on hover */
+        .topnav a:hover {
+            background-color: rgb(0, 0, 0); /* darkens link when user hovers */
+            color: white;
+        }
+
+        /* add a color to the active/current link */
+        .topnav a.active {
+            background-color: rgb(239, 232, 222); /* highlights current page */
+            color: black;
+        }
+
+        .tag {
+            background-color: rgb(232, 115, 36);
+            border-radius: 20px;
+            padding: 10px;
+            padding-top: 5px;
+            line-height: 2;
+            padding-bottom: 5px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            background-color: rgb(232, 115, 36);
+            border-radius: 20px; /* i cant think of the word for this shaped button */
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            color: white;
+            font-weight: bold;
+            font-family: Arial;
+            border: none; /* removes default browser button border */
+            cursor: pointer; /* shows hand cursor on hover --> https://www.w3schools.com/cssref/pr_class_cursor.asp */
+            font-size: 15px;
+            width: 100%; /* stretches button across full width of box */
+            line-height: 2;
+        }
+
+        .submit-btn:hover {
+            background-color: black;
+        }
+
+        .flash {
+            /* error/confirmation message box */
+            background-color: rgb(255, 220, 200);
+            color: rgb(180, 60, 0);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: Arial;
+            font-size: 14px;
+        }
+         {% block styles %}{% endblock %}
+    </style>
+       
+<!-- https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates -->
+    
+<body>
+        <!-- nav block -- each page overrides this to add class="active" to the right link -->
+        {% block nav %}
+        <div class="topnav">
+            <a href="{{ url_for('main.list') }}">List</a>
+            <a href="{{ url_for('main.map') }}">Map</a>
+            <a href="{{ url_for('main.suggest') }}">Suggest</a>
+            <!-- show Admin + Logout if logged in otherwise show Login -->
+            <!-- current_user.is_authenticated is from Flask-Login (Miguel Chapter 5) -->
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.admin_list') }}">Admin</a>
+            <a href="{{ url_for('main.adminlogout') }}">Logout</a>
+            {% else %}
+            <a href="{{ url_for('main.adminlogin') }}">Login</a>
+            {% endif %}
+        </div>
+        {% endblock %}
+
+        <!-- for page specific content (Miguel) -->
+        {% block content %}{% endblock %}
+    </body>
+</html>
