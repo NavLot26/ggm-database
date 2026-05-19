@@ -20,9 +20,6 @@ def list():
    
     form = TagSearchForm()
 
-    print(request.method)
-    print(form.errors)
-
     if form.validate_on_submit():
         print("pushing to session")
         include_ids = form.include.data
@@ -41,7 +38,6 @@ def list():
     )
 
     return render_template('list.html', orgs=filtered, form=form)
-
 
 @app.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
