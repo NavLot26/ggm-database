@@ -3,50 +3,52 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
 
 from app.forms import LoginForm, OrganizationForm, TagSearchForm
-from app.models import User, Org, Tag
+from app.models import Org, Tag
+
+from flask import session
+
+from sqlalchemy import func
 
 ggm = Blueprint('main', __name__)
 
-@ggm.route('/', methods=['GET', 'POST'])
-@ggm.route('/list', methods=['GET', 'POST'])
-def list():
-    # only display published organizations on the orgslist page
-    organizations = Org.query.filter_by(published=True).all()
-    tagobjs = Tag.query.all()
-    tags = []
-    for tag in tagobjs:
-        tags.append(tagobjs.name)
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/list', methods=['GET', 'POST'])
+def list(): 
     form = TagSearchForm()
 
-    filterin = []
-    filterout = []
-
-    for i in range(len(organizations)-1, -1, -1):   #really messy and non-optimized but i think functional code for list filtering
-        valid = True
-        for fin in filterin:
-            found = False
-            for tag in organizations[i].tags:
-                if (tag.name == fin):
-                    found = True
-            if not found:
-                valid = False
-        for fout in filterout:
-            found = False
-            for tag in organizations[i].tags:
-                if (tag.name == fout):
-                    found = True
-            if found:
-                valid = False
-        if not valid:
-            organizations.pop(i)
-    
-
     if form.validate_on_submit():
-        filterin = form.include.data
-        filterout = form.include.data
-    return render_template('list.html', orgs=organizations, tags=tags, form=form, filterin = filterin, filterout = filterout)
+        include_ids = form.include.data
+        session["include"] = include_ids
 
-@ggm.route('/Adminlogin', methods=['GET', 'POST'])
+    else: 
+        include_ids = session.get("include", [])
+        form.include.data = include_ids
+
+    # we update the session data to the form data on post 
+    if form.validate_on_submit():
+        session["include"] = form.include.data
+        return redirect(url_for("list"))  # Fix bug with refresh interference and stuff 
+
+
+    
+    filtered = (
+        db.session.query(Org)
+        .filter(Org.published == True)
+    )
+
+    if include_ids:
+        filtered = filtered.filter(
+            Org.tags.any(Tag.id.in_(include_ids))
+        )
+
+    filtered = filtered.all()
+
+    print(filtered)
+
+    return render_template('list.html', orgs=filtered, form=form)
+
+@app.route('/Adminlogin', methods=['GET', 'POST'])
 def adminlogin():
     if current_user.is_authenticated:
         return redirect(url_for('main.admin_list'))
@@ -54,6 +56,7 @@ def adminlogin():
     form = LoginForm()
 
     if form.validate_on_submit():
+        # check if the user exists and the password is correct
         user = User.query.filter_by(username=form.username.data).first()
 
         if user is None or not user.check_password(current_user.password):
@@ -66,19 +69,42 @@ def adminlogin():
 
     return render_template('admin_login.html', form=form)
     
-@ggm.route('/Adminlogout')
+@app.route('/Adminlogout')
 @login_required
 def adminlogout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.list'))
 
-@ggm.route('/admin_list')
+@app.route('/admin_list')
+# this is the admin page that lists all the organizations and tags, it is only accessible to logged in users
 @login_required
 def admin_list():
     organizations = Org.query.all()
     tags = Tag.query.all()
     return render_template('admin_list.html', organizations=organizations, tags=tags)
+
+@ggm.route('/suggest', methods=['GET', 'POST'])
+def suggest():
+    form = OrganizationForm()
+
+    if form.validate_on_submit():
+        org = Org(
+            name=form.name.data,
+            website=form.website.data,
+            description=form.description.data,
+            address1=form.address1.data,
+            address2=form.address2.data,
+            city=form.city.data,
+            state=form.state.data,
+            published=False
+        )
+        db.session.add(org)
+        db.session.commit()
+        flash('Organization suggestion submitted successfully.', 'success')
+        return redirect(url_for('main.list'))
+
+    return render_template('suggest.html', form=form)
 
 @ggm.route('/admin_suggest', methods=['GET', 'POST'])
 @login_required
@@ -87,3 +113,10 @@ def admin_suggest():
         # Handle form submission
         pass
     return render_template('admin_suggest.html')
+
+
+# <!-- <a href="{{ url_for('map') }}">Map</a> -->
+#  <!-- <a class="active" href="{{ url_for('list') }}">List</a>
+          
+#           <a href="{{ url_for('suggest') }}">Suggest</a>
+#           <a href="{{ url_for('login') }}">Login</a> -->
